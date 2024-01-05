@@ -103,7 +103,7 @@ def chat(message):
 def start(message):
     bot.send_chat_action(message.chat.id, action='typing')
     chat(message)
-    smsg = "بوت المعاني يعمل!\nأرسل لي كلمة وسأبحث لك عن معناها في ستّة قواميس عربيّة."
+    smsg = "بوت المعاني يعمل!\nأرسل كلمة لأبحث عن معناها في ستّة قواميس عربيّة."
     bot.reply_to(message, smsg)
     
 @bot.message_handler(commands=['contact'])
