@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup as bs
-import requests
+import cloudscraper
 import json
 import re
 import telebot
@@ -12,28 +12,12 @@ from server import server
 API_KEY = os.environ.get('API_KEY')
 CHATID = os.environ.get('CHATID')
 
-headers = {
-    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    'Referer': 'https://www.google.com/',
-    'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-    }
-
-headers1 = {
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Referer': 'https://www.almaany.com/ar/dict/ar-ar/%D8%A7%D9%86%D8%AA%D8%B5%D8%A7%D8%B1/',
-    'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"Windows"',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'X-Requested-With': 'XMLHttpRequest',
-}
-
 bot = telebot.TeleBot(API_KEY)
 server()
 
 def get_suggestions(word):
-    url = 'https://www.almaany.com/suggest.php?term={}&lang=arabic&t=d'.format(word)
-    r = requests.get(url, headers=headers1)
+    scraper = cloudscraper.create_scraper(delay=1, browser="chrome") 
+    r = scraper.get('https://www.almaany.com/suggest.php?term={}&lang=arabic&t=d'.format(word))
     suggestions = []
     if r.status_code == 200:
         soup = bs(r.content, features='lxml')
@@ -67,8 +51,9 @@ def add_dict_markup(markup, selected_word):
 
 
 def get_maany(selected_word: str) -> []:
+        scraper = cloudscraper.create_scraper(delay=1, browser="chrome") 
         url = 'https://www.almaany.com/ar/dict/ar-ar/{}/'.format(selected_word)
-        r = requests.get(url, headers=headers)
+        r = scraper.get(url)
         if r.status_code == 200:
             soup = bs(r.content, features='lxml')
             maany_raw = soup.find("ol", class_=re.compile("^meaning$|results"))
@@ -89,7 +74,8 @@ def get_maany(selected_word: str) -> []:
             return maany_list
             
 def get_maany_else(url: str) -> []:
-        r = requests.get(url, headers=headers)
+        scraper = cloudscraper.create_scraper(delay=1, browser="chrome") 
+        r = scraper.get(url)
         if r.status_code == 200:
             soup = bs(r.content, features='lxml')
             maany_raw = soup.find("ol", class_=re.compile("^meaning$|results"))
