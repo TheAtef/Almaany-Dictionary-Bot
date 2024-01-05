@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup as bs
-import requests
+import cfscrape
 import json
 import re
 import telebot
@@ -10,7 +10,6 @@ import os
 from server import server
 
 API_KEY = os.environ.get('API_KEY')
-API_KEY_ZEN = os.environ.get('API_KEY_ZEN')
 CHATID = os.environ.get('CHATID')
 
 bot = telebot.TeleBot(API_KEY)
@@ -18,11 +17,8 @@ server()
 
 def get_suggestions(word):
     url = 'https://www.almaany.com/suggest.php?term={}&lang=arabic&t=d'.format(word)
-    params = {
-        'url': url,
-        'apikey': API_KEY_ZEN,
-    }
-    r = requests.get('https://api.zenrows.com/v1/', params=params)
+    scraper = cfscrape.create_scraper()
+    r = scraper.get(url)
     suggestions = []
     if r.status_code == 200:
         soup = bs(r.content, features='lxml')
@@ -57,11 +53,8 @@ def add_dict_markup(markup, selected_word):
 
 def get_maany(selected_word: str) -> []:
         url = 'https://www.almaany.com/ar/dict/ar-ar/{}/'.format(selected_word)
-        params = {
-            'url': url,
-            'apikey': API_KEY_ZEN,
-        }
-        r = requests.get('https://api.zenrows.com/v1/', params=params)
+        scraper = cfscrape.create_scraper()
+        r = scraper.get(url)
         if r.status_code == 200:
             soup = bs(r.content, features='lxml')
             maany_raw = soup.find("ol", class_=re.compile("^meaning$|results"))
@@ -82,11 +75,8 @@ def get_maany(selected_word: str) -> []:
             return maany_list
             
 def get_maany_else(url: str) -> []:
-        params = {
-        'url': url,
-        'apikey': API_KEY_ZEN,
-        }
-        r = requests.get('https://api.zenrows.com/v1/', params=params)
+        scraper = cfscrape.create_scraper()
+        r = scraper.get(url)
         if r.status_code == 200:
             soup = bs(r.content, features='lxml')
             maany_raw = soup.find("ol", class_=re.compile("^meaning$|results"))
