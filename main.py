@@ -13,15 +13,27 @@ API_KEY = os.environ.get('API_KEY')
 CHATID = os.environ.get('CHATID')
 
 headers = {
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Referer': 'https://www.google.com/',
     'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
     }
+
+headers1 = {
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Referer': 'https://www.almaany.com/ar/dict/ar-ar/%D8%A7%D9%86%D8%AA%D8%B5%D8%A7%D8%B1/',
+    'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Platform': '"Windows"',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'X-Requested-With': 'XMLHttpRequest',
+}
 
 bot = telebot.TeleBot(API_KEY)
 server()
 
 def get_suggestions(word):
     url = 'https://www.almaany.com/suggest.php?term={}&lang=arabic&t=d'.format(word)
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers1)
     suggestions = []
     if r.status_code == 200:
         soup = bs(r.content, features='lxml')
